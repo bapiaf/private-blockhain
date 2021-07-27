@@ -3,10 +3,10 @@
  *  The Block class is a main component into any Blockchain platform, 
  *  it will store the data and act as a dataset for your application.
  *  The class will expose a method to validate the data... The body of
- *  the block will contain an Object that contain the data to be stored,
+ *  the block will contain an Object that contains the data to be stored,
  *  the data should be stored encoded.
  *  All the exposed methods should return a Promise to allow all the methods 
- *  run asynchronous.
+ *  to run asynchronously.
  */
 
 const SHA256 = require('crypto-js/sha256');
@@ -35,16 +35,32 @@ class Block {
      *  5. Resolve true or false depending if it is valid or not.
      *  Note: to access the class values inside a Promise code you need to create an auxiliary value `let self = this;`
      */
-    validate() {
+    async validate() {
         let self = this;
         return new Promise((resolve, reject) => {
             // Save in auxiliary variable the current block hash
-                                            
-            // Recalculate the hash of the Block
-            // Comparing if the hashes changed
-            // Returning the Block is not valid
+            currentHash = self.hash;
             
-            // Returning the Block is valid
+            // Recalculate the hash of the Block
+            try {
+                calculatedHash = await SHA256(JSON.stringify(self)).toString();
+
+                // Comparing if the hashes changed
+                if (currentHash == calculatedHash) {
+                    // Returning the Block is valid
+                    resolve (true);
+                }
+                else {
+                    // Returning the Block is not valid
+                    resolve (false);
+                }
+            }
+
+            catch (err) {
+                console.log(err);
+                reject(err);
+              }
+                                                   
 
         });
     }
