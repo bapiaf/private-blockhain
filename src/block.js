@@ -74,13 +74,33 @@ class Block {
      *  3. Resolve with the data and make sure that you don't need to return the data for the `genesis block` 
      *     or Reject with an error.
      */
-    getBData() {
+    async getBData() {
         // Getting the encoded data saved in the Block
-        // Decoding the data to retrieve the JSON representation of the object
-        // Parse the data to an object to be retrieve.
+        data = this.body;
+        console.log (data);
+        let self = this;
+        try {
+            // Decoding the data to retrieve the JSON representation of the object
+            decodedData = hex2ascii (data);
+            console.log (decodedData)
+            // Parse the data to an object to be retrieve.
+            decodedDataObject = JSON.parse(decodedData);
 
-        // Resolve with the data if the object isn't the Genesis block
+            // Resolve with the data if the object isn't the Genesis block
+            if (self.height == 0) {
+                reject ("this is the Genesis block")
+            }
 
+            else {
+                resolve (decodedDataObject);
+            }
+        }
+
+        catch (err) {
+            console.log(err);
+            reject(err);
+          }
+        
     }
 
 }
