@@ -35,7 +35,7 @@ class Block {
      *  5. Resolve true or false depending if it is valid or not.
      *  Note: to access the class values inside a Promise code you need to create an auxiliary value `let self = this;`
      */
-    async validate() {
+    validate() {
         let self = this;
         return new Promise((resolve, reject) => {
             // Save in auxiliary variable the current block hash
@@ -74,33 +74,35 @@ class Block {
      *  3. Resolve with the data and make sure that you don't need to return the data for the `genesis block` 
      *     or Reject with an error.
      */
-    async getBData() {
-        // Getting the encoded data saved in the Block
-        data = this.body;
-        console.log (data);
-        let self = this;
-        try {
-            // Decoding the data to retrieve the JSON representation of the object
-            decodedData = hex2ascii (data);
-            console.log (decodedData)
-            // Parse the data to an object to be retrieve.
-            decodedDataObject = JSON.parse(decodedData);
-
-            // Resolve with the data if the object isn't the Genesis block
-            if (self.height == 0) {
-                reject ("this is the Genesis block")
-            }
-
-            else {
-                resolve (decodedDataObject);
-            }
-        }
-
-        catch (err) {
-            console.log(err);
-            reject(err);
-          }
+    getBData() {
         
+        let self = this;
+        return new Promise((resolve, reject) => {
+            // Getting the encoded data saved in the Block
+            data = this.body;
+            console.log (data);
+            try {
+                // Decoding the data to retrieve the JSON representation of the object
+                decodedData = hex2ascii (data);
+                console.log (decodedData)
+                // Parse the data to an object to be retrieve.
+                decodedDataObject = JSON.parse(decodedData);
+
+                // Resolve with the data if the object isn't the Genesis block
+                if (self.height == 0) {
+                reject ("this is the Genesis block")
+                }
+
+                else {
+                    resolve (decodedDataObject);
+                }
+            }
+
+            catch (err) {
+                console.log(err);
+                reject(err);
+            }
+        });
     }
 
 }
