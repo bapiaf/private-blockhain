@@ -44,8 +44,9 @@ class Blockchain {
      * Utility method that return a Promise that will resolve with the height of the chain
      */
     getChainHeight() {
+        let self = this;
         return new Promise((resolve, reject) => {
-            resolve(this.height);
+            resolve(self.height);
         });
     }
 
@@ -147,7 +148,14 @@ class Blockchain {
 
             if (timeOK && idOK) {
                 try {
-                    let newBlock = new BlockClass.Block(star);
+                    let data = {
+                        address: address,
+                        message: message,
+                        signature: signature,
+                        star: star
+                    }
+                    console.log (data); 
+                    let newBlock = new BlockClass.Block(data);
                     await this._addBlock(newBlock);
                     resolve(newBlock);
                 }
@@ -174,6 +182,17 @@ class Blockchain {
     getBlockByHash(hash) {
         let self = this;
         return new Promise((resolve, reject) => {
+
+            const filteredBlock = self.chain.filter(block => block.hash === hash);
+            console.log (filteredBlock)
+
+            if (filteredBlock.length > 0) {
+                resolve (filteredBlock[0]);
+            }
+
+            else {
+                reject ("No block with that hash")
+            }
            
         });
     }
@@ -201,10 +220,29 @@ class Blockchain {
      * Remember the star should be returned decoded.
      * @param {*} address 
      */
-    getStarsByWalletAddress (address) {
+    async getStarsByWalletAddress (address) {
         let self = this;
         let stars = [];
         return new Promise((resolve, reject) => {
+
+            let starBlocks = self.chain.slice(1);
+            try {
+                for (const Block of starBlocks) {
+                    const blockData = await Block.getBData();
+                    if (blockData.address === address)
+                        {
+                            stars.push(blockData.star);
+                        }
+                }
+                resolve (stars);
+            }
+
+            catch (err) {
+                console.log(err);
+                reject(err);
+              }
+            
+
             
         });
     }
@@ -215,10 +253,48 @@ class Blockchain {
      * 1. You should validate each block using `validateBlock`
      * 2. Each Block should check the with the previousBlockHash
      */
-    validateChain() {
+    async validateChain() {
         let self = this;
-        let errorLog = [];
+    
+        let chainValidation = {
+            isChainValid: true,
+            errorLog: []
+        }
+
         return new Promise(async (resolve, reject) => {
+
+            try {
+                for (var i = 0; i < self.chain.length; i++) {
+                    let blockErrors = {
+                        blockHeight: i,
+                        isBlockValid: null,
+                        isPreviousHashValid: null
+                    }
+
+                    const isBlockValid = await self.chain[i].validate();
+                    if (isBlockValid !== true)
+                        {
+                            blockErrors.isBlockValid = isBlockValid;
+                            chainValidation.isChainValid = false;
+                        }
+
+                    if (i > 0) {
+                        const isPreviousHashValid = (self.chain[i].previousBlockHash === self.chain[i-1].hash) ? true : false; 
+                        if (isPreviousHashValid !== true) 
+                            {
+                                blockErrors.isPreviousHashValid = isPreviousHashValid;
+                                chainValidtion.isChainValid = false;
+                            }
+                    } 
+                    chainValidation.errorLog.push(blockErrors);  
+                }
+                resolve (chainValidation);
+            }
+
+            catch (err) {
+                console.log(err);
+                reject(err);
+              }
             
         });
     }

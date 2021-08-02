@@ -85,7 +85,7 @@ class Block {
                 // Decoding the data to retrieve the JSON representation of the object
                 decodedData = hex2ascii (data);
                 console.log (decodedData)
-                // Parse the data to an object to be retrieve.
+                // Parse the data to an object to be retrieved.
                 decodedDataObject = JSON.parse(decodedData);
 
                 // Resolve with the data if the object isn't the Genesis block

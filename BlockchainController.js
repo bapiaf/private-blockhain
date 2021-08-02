@@ -2,16 +2,16 @@
  *          BlockchainController
  *
  * 
- * This class expose the endpoints that the client applications will use to interact with the 
+ * This class exposes the endpoints that the client applications will use to interact with the 
  * Blockchain dataset
  */
 class BlockchainController {
 
-    //The constructor receive the instance of the express.js app and the Blockchain class
+    //The constructor receives the instance of the express.js app and the Blockchain class
     constructor(app, blockchainObj) {
         this.app = app;
         this.blockchain = blockchainObj;
-        // All the endpoints methods needs to be called in the constructor to initialize the route.
+        // All the endpoints methods need to be called in the constructor to initialize the route.
         this.getBlockByHeight();
         this.requestOwnership();
         this.submitStar();
