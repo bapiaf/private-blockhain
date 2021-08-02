@@ -56,14 +56,32 @@ class Blockchain {
      * or reject if an error happen during the execution.
      * You will need to check for the height to assign the `previousBlockHash`,
      * assign the `timestamp` and the correct `height`...At the end you need to 
-     * create the `block hash` and push the block into the chain array. Don't for get 
+     * create the `block hash` and push the block into the chain array. Don't forget 
      * to update the `this.height`
      * Note: the symbol `_` in the method name indicates in the javascript convention 
      * that this method is a private method. 
      */
-    _addBlock(block) {
+    _addBlock(newBlock) {
         let self = this;
         return new Promise(async (resolve, reject) => {
+
+            try {
+                newBlock.height = self.chain.length;
+                newBlock.time = new Date().getTime().toString.slice(0, -3);
+                if (self.chain.length > 0) {
+                    newBlock.previousBlockHash = self.chain[self.chain.length - 1].hash;
+                }
+
+                newBlock.hash = SHA256(JSON.stringify(newBlock).toString());
+                self.chain.push(newBlock);
+                console.log(newBlock);
+                resolve(newBlock);
+            }
+
+            catch (err) {
+                console.log(err);
+                reject(err);
+              }
            
         });
     }
@@ -77,8 +95,21 @@ class Blockchain {
      * @param {*} address 
      */
     requestMessageOwnershipVerification(address) {
-        return new Promise((resolve) => {
-            
+        return new Promise((resolve, reject) => {
+
+            try {
+                let message = "";
+                let date = "";
+                date = new Date().getTime().toString().slice(0,-3);
+                message = address + ":" + date + ":starRegistry";
+                console.log (message);
+                resolve(message);
+            }
+
+            catch (err) {
+                console.log(err);
+                reject(err);
+              }
         });
     }
 
@@ -99,9 +130,37 @@ class Blockchain {
      * @param {*} signature 
      * @param {*} star 
      */
-    submitStar(address, message, signature, star) {
+    async submitStar(address, message, signature, star) {
         let self = this;
         return new Promise(async (resolve, reject) => {
+
+            let messageTime = parseInt(message.split(':')[1]);
+            console.log (messageTime);
+
+            let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
+
+            let timeOK = (currentTime - messageTime < 300000) ? true : false;
+            console.log (timeOK);
+
+            let idOK = bitcoinMessage.verify(message, address, signature);
+            console.log (idOK);
+
+            if (timeOK && idOK) {
+                try {
+                    let newBlock = new BlockClass.Block(star);
+                    await this._addBlock(newBlock);
+                    resolve(newBlock);
+                }
+                catch (err) {
+                    console.log(err);
+                    reject(err);
+                  }
+            }
+
+            else { 
+                
+                reject("invalid request: identity verification is " + idOK + "time verification is " + timeOK)}
+
             
         });
     }

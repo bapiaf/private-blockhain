@@ -43,7 +43,7 @@ class Block {
             
             // Recalculate the hash of the Block
             try {
-                calculatedHash = await SHA256(JSON.stringify(self)).toString();
+                calculatedHash = SHA256(JSON.stringify(self)).toString();
 
                 // Comparing if the hashes changed
                 if (currentHash == calculatedHash) {
