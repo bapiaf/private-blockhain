@@ -73,7 +73,7 @@ class Blockchain {
                     newBlock.previousBlockHash = self.chain[self.chain.length - 1].hash;
                 }
 
-                newBlock.hash = SHA256(JSON.stringify(newBlock).toString());
+                newBlock.hash = SHA256(JSON.stringify(newBlock)).toString();
                 self.chain.push(newBlock);
                 const newChainValidation = await self.validateChain(); 
                 console.log(newChainValidation);
@@ -139,14 +139,15 @@ class Blockchain {
             console.log (messageTime);
 
             let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
+            console.log(currentTime);
 
-            let timeOK = (currentTime - messageTime < 300000) ? true : false;
-            console.log (timeOK);
+            let isTimeLessThanFiveMin = (currentTime - messageTime < 5*60) ? true : false;
+            console.log (isTimeLessThanFiveMin);
 
-            let idOK = bitcoinMessage.verify(message, address, signature);
-            console.log (idOK);
+            let isSignatureVerified = bitcoinMessage.verify(message, address, signature);
+            console.log (isSignatureVerified);
 
-            if (timeOK && idOK) {
+            if (isTimeLessThanFiveMin && isSignatureVerified) {
                 try {
                     let data = {
                         address: address,
@@ -167,7 +168,7 @@ class Blockchain {
 
             else { 
                 
-                return("invalid request: identity verification is " + idOK + " time verification is " + timeOK)}
+                return("invalid request: identity verification is " + isSignatureVerified + " time verification is " + isTimeLessThanFiveMin)}
 
             
         
