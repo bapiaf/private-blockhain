@@ -166,7 +166,7 @@ class Blockchain {
 
             else { 
                 
-                return("invalid request: identity verification is " + idOK + "time verification is " + timeOK)}
+                return("invalid request: identity verification is " + idOK + " time verification is " + timeOK)}
 
             
         
@@ -230,7 +230,11 @@ class Blockchain {
                     const starBlockData = await starBlock.getBData();
                     if (starBlockData.address === address)
                         {
-                            stars.push(starBlockData.star);
+                            let starBlockDataByOwner = {
+                                owner: starBlockData.address,
+                                star: starBlockData.star
+                            }
+                            stars.push(starBlockDataByOwner);
                         }
                 }
                 return (stars);
