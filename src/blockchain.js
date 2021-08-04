@@ -62,13 +62,13 @@ class Blockchain {
      * Note: the symbol `_` in the method name indicates in the javascript convention 
      * that this method is a private method. 
      */
-    _addBlock(newBlock) {
+    async _addBlock(newBlock) {
         let self = this;
-        return new Promise(async (resolve, reject) => {
-
+        
             try {
                 newBlock.height = self.chain.length;
-                newBlock.time = new Date().getTime().toString.slice(0, -3);
+                let currentTime = parseInt(new Date().getTime().toString().slice(0, -3));
+                newBlock.time = currentTime
                 if (self.chain.length > 0) {
                     newBlock.previousBlockHash = self.chain[self.chain.length - 1].hash;
                 }
@@ -76,15 +76,14 @@ class Blockchain {
                 newBlock.hash = SHA256(JSON.stringify(newBlock).toString());
                 self.chain.push(newBlock);
                 console.log(newBlock);
-                resolve(newBlock);
+                return(newBlock);
             }
 
             catch (err) {
                 console.log(err);
-                reject(err);
+                return(err);
               }
            
-        });
     }
 
     /**
@@ -133,7 +132,7 @@ class Blockchain {
      */
     async submitStar(address, message, signature, star) {
         let self = this;
-        return new Promise(async (resolve, reject) => {
+        
 
             let messageTime = parseInt(message.split(':')[1]);
             console.log (messageTime);
@@ -157,20 +156,20 @@ class Blockchain {
                     console.log (data); 
                     let newBlock = new BlockClass.Block(data);
                     await this._addBlock(newBlock);
-                    resolve(newBlock);
+                    return(newBlock);
                 }
                 catch (err) {
                     console.log(err);
-                    reject(err);
+                    return(err);
                   }
             }
 
             else { 
                 
-                reject("invalid request: identity verification is " + idOK + "time verification is " + timeOK)}
+                return("invalid request: identity verification is " + idOK + "time verification is " + timeOK)}
 
             
-        });
+        
     }
 
     /**
@@ -223,28 +222,26 @@ class Blockchain {
     async getStarsByWalletAddress (address) {
         let self = this;
         let stars = [];
-        return new Promise((resolve, reject) => {
+        
+        let starBlocks = self.chain.slice(1);
 
-            let starBlocks = self.chain.slice(1);
             try {
-                for (const Block of starBlocks) {
-                    const blockData = await Block.getBData();
-                    if (blockData.address === address)
+                for (const starBlock of starBlocks) {
+                    const starBlockData = await starBlock.getBData();
+                    if (starBlockData.address === address)
                         {
-                            stars.push(blockData.star);
+                            stars.push(starBlockData.star);
                         }
                 }
-                resolve (stars);
+                return (stars);
             }
 
             catch (err) {
                 console.log(err);
-                reject(err);
+                return(err);
               }
             
-
-            
-        });
+        
     }
 
     /**
@@ -261,7 +258,7 @@ class Blockchain {
             errorLog: []
         }
 
-        return new Promise(async (resolve, reject) => {
+        
 
             try {
                 for (var i = 0; i < self.chain.length; i++) {
@@ -288,15 +285,14 @@ class Blockchain {
                     } 
                     chainValidation.errorLog.push(blockErrors);  
                 }
-                resolve (chainValidation);
+                return (chainValidation);
             }
 
             catch (err) {
                 console.log(err);
-                reject(err);
+                return(err);
               }
             
-        });
     }
 
 }
