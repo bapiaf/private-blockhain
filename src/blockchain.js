@@ -75,7 +75,6 @@ class Blockchain {
 
                 newBlock.hash = SHA256(JSON.stringify(newBlock).toString());
                 self.chain.push(newBlock);
-                console.log(self.chain);
                 const newChainValidation = await self.validateChain(); 
                 console.log(newChainValidation);
                 return(newBlock);
